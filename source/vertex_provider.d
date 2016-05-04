@@ -1,6 +1,7 @@
 module vertex_provider;
 
 import gfm.math: vec3f, vec4f;
+import gfm.opengl: GLenum, GL_TRIANGLES, GL_POINTS, GL_LINE_STRIP;
 
 struct Vertex
 {
@@ -10,7 +11,51 @@ struct Vertex
 
 struct VertexSlice
 {
+    private GLenum _kind;
+
+    enum Kind { Triangles, Points, LineStrip, }
+
+    auto glKind() const
+    {
+        return _kind;
+    }
+
+    auto kind() const
+    {
+        switch(_kind)
+        {
+            case GL_TRIANGLES:
+                return Kind.Triangles;
+            case GL_POINTS:
+                return Kind.Points;
+            case GL_LINE_STRIP:
+                return Kind.LineStrip;
+            default:
+                assert(0);
+        }
+    }
+
+    auto kind(Kind kind)
+    {
+        final switch(kind)
+        {
+            case Kind.Triangles:
+                return GL_TRIANGLES;
+            case Kind.Points:
+                return GL_POINTS;
+            case Kind.LineStrip:
+                return GL_LINE_STRIP;
+        }
+    }
+
     size_t start, length;
+
+    this(Kind k, size_t start, size_t length)
+    {
+        kind(k);
+        this.start  = start;
+        this.length = length;
+    }
 }
 
 class VertexProvider
@@ -190,9 +235,9 @@ auto testVertexProvider()
     ], 
     // VertexSlice
     [
-        VertexSlice(29, 16), 
-        VertexSlice(58, 32), 
-        VertexSlice( 0, 16),
+        VertexSlice(VertexSlice.Kind.LineStrip, 29, 16), 
+        VertexSlice(VertexSlice.Kind.LineStrip, 58, 32), 
+        VertexSlice(VertexSlice.Kind.LineStrip,  0, 16),
     ],
     vec3f(0, 0, 0),
     vec3f(10_000, 60_000, 0)
