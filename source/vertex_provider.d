@@ -40,11 +40,14 @@ struct VertexSlice
         final switch(kind)
         {
             case Kind.Triangles:
-                return GL_TRIANGLES;
+                _kind = GL_TRIANGLES;
+            break;
             case Kind.Points:
-                return GL_POINTS;
+                _kind = GL_POINTS;
+            break;
             case Kind.LineStrip:
-                return GL_LINE_STRIP;
+                _kind = GL_LINE_STRIP;
+            break;
         }
     }
 
@@ -83,7 +86,10 @@ class VertexProvider
 
 		foreach(s, ref cs; lockstep(_slices, _curr_slices))
         {
-            cs.length = min(cast(int) (s.length), n);
+            auto nn = n;
+            if(cs.kind == VertexSlice.Kind.Triangles)
+                nn = n*3;
+            cs.length = min(cast(int) (s.length), nn);
             cs.start = cast(int) (s.start + s.length - cs.length);
         }
 	}
